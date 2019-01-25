@@ -1,5 +1,7 @@
 package de.cimt.talendcomp.checksum;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
@@ -193,10 +195,37 @@ public class Normalization {
 
 //        if (object instanceof Byte)
 //            return normalize((Byte) object);
+        if (object.getClass().getName().equals("routines.system.Dynamic")) {
+            try {
+                // handle enterprise feature datatype dynamic
+                return handleDynamic(object, itemConfig);
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+                throw new RuntimeException("Issue normalizing Dynamic", ex);
+            }
+        }
 
         throw new IllegalArgumentException("Unsupported data type: " + object.getClass());
-	}
+    }
+    
+    private String handleDynamic(Object object, NormalizeObjectConfig itemConfig) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
+        final Class  clazz =object.getClass();
+        final Method getColumnValue = clazz.getMethod("getColumnValue", new Class[]{ int.class });
+        
+        int count= (int) clazz.getMethod("getColumnCount", new Class[]{}).invoke( object, new Object[]{} );
+        
+        StringBuilder result = new StringBuilder();
 
+        for(int i=0; i<count; i++){
+            if (i>0) 
+                result.append(config.getDelimter());
+
+            result.append( normalize( getColumnValue.invoke(object, i) , itemConfig) );
+
+        }
+        return result.toString();
+    }
+    
 	
 	public String normalize(final Integer value) {
     	return normalizeNumber(value, config.getIntegerFormat());
