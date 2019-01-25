@@ -75,3 +75,10 @@ If all input values are null, the hash value will be replaced with the given val
 ### Show hash input
 If checked the hash input (concatenation of all input values) will be exposed to the selected column
 
+## Support of Enterprise features
+This version supports the dynamic datatype. To use it's necessary to register this component in the talend plugin jar or to cast type to Object type. 
+From https://help.talend.com/reader/MNcEDgjyM49yQ58GboyG4Q/doXCP4sJgwe85tm8ny5Zqw
+
+For a list of components that support this feature, go to <install_dir>/plugins/, where <install_dir> is the Studio installation directory, extract the jar file org.talend.core.tis_<version>.jar to get the text file supportDynamic.txt in the resources folder.
+
+
