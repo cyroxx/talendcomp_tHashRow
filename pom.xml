@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.cimt.talendcomp</groupId>
     <artifactId>cimt-talendcomp-hashrow</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <packaging>jar</packaging>
 
     <name>talendcomp_tHashRow [FORK DK ${version}]</name>

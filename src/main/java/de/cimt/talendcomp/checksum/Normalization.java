@@ -209,8 +209,9 @@ public class Normalization {
     }
     
     private String handleDynamic(Object object, NormalizeObjectConfig itemConfig) throws NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{
-        final Class  clazz =object.getClass();
+        final Class  clazz = object.getClass();
         final Method getColumnValue = clazz.getMethod("getColumnValue", new Class[]{ int.class });
+        
         
         int count= (int) clazz.getMethod("getColumnCount", new Class[]{}).invoke( object, new Object[]{} );
         
