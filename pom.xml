@@ -22,6 +22,11 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.colllib</groupId>
+            <artifactId>colllib</artifactId>
+            <version>1.6</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -44,9 +49,26 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>tHashRow</id>
+                        <goals>
+                            <goal>component</goal>                          
+                        </goals>
+                        <configuration>
+                            <componentName>tHashRow</componentName>
+                            <noJars>false</noJars>
+                            <keepImports>false</keepImports>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tMultiHashRow</id>
                         <goals>
                             <goal>component</goal>
                         </goals>
+                        <configuration>
+                            <componentName>tMultiHashRow</componentName>
+                            <noJars>false</noJars>
+                            <keepImports>false</keepImports>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

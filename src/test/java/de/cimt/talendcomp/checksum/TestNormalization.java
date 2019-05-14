@@ -22,21 +22,21 @@ public class TestNormalization {
 
     @Test
     public void testLowerCaseString() throws Exception {
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.LOWER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.LOWER_CASE);
         String result = md5Base.normalize("Test", itemConfig);
         assertEquals("\"test\"", result);
     }
 
     @Test
     public void testUpperCaseString() throws Exception {
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	String result = md5Base.normalize("Test", itemConfig);
         assertEquals("\"TEST\"", result);
     }
 
     @Test
     public void testCaseSensitiveString() throws Exception {
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.CASE_SENSITIVE);
+    	itemConfig.setCaseSensitive(CaseSensitive.CASE_SENSITIVE);
         String result = md5Base.normalize("TeSt", itemConfig);
         assertEquals("\"TeSt\"", result);
     }
@@ -44,7 +44,7 @@ public class TestNormalization {
     @Test
     public void testSpecialCharacters() throws Exception {
     	
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
     	assertEquals("\"STRASSE\"", md5Base.normalize("Straße",itemConfig));
@@ -55,7 +55,7 @@ public class TestNormalization {
     @Test
     public void testTrimming() throws Exception {
 
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
     	
@@ -74,7 +74,7 @@ public class TestNormalization {
     @Test
     public void testQuoting() throws Exception {
 
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
         assertEquals("\"ABC\"", md5Base.normalize("abc", itemConfig));
@@ -96,20 +96,20 @@ public class TestNormalization {
     @Test
     public void testChar() throws Exception {
     
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
     	assertEquals("\"A\"", md5Base.normalize('A', itemConfig));
         assertEquals("\"A\"", md5Base.normalize('a', itemConfig));
         
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.LOWER_CASE);
+        itemConfig.setCaseSensitive(CaseSensitive.LOWER_CASE);
         assertEquals("\"a\"", md5Base.normalize('A', itemConfig));
     }
 
     @Test
     public void testNumericValues() throws IllegalArgumentException {
 
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
     	// default normalization
@@ -241,7 +241,7 @@ public class TestNormalization {
         Double d = null;
         
         config.setNullReplacement("");
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+        itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
         
         assertEquals("", md5Base.normalize(s, itemConfig));
@@ -260,7 +260,7 @@ public class TestNormalization {
     public void testNullNull() throws IllegalArgumentException {
         
     	config.setNullReplacement("");
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+        itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	itemConfig.setTrimming(true);
     	
     	md5Base.reset();
@@ -296,7 +296,7 @@ public class TestNormalization {
     public void testCaseSensitiveNormalization() throws IllegalArgumentException {
         
     	config.setNullReplacement("");
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.CASE_SENSITIVE);
+        itemConfig.setCaseSensitive(CaseSensitive.CASE_SENSITIVE);
     	itemConfig.setTrimming(true);
     	
     	md5Base.reset();
@@ -420,7 +420,7 @@ public class TestNormalization {
 //    @Test
 //    public void testMassiveUse() {
 //    	
-//        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.CASE_SENSITIVE);
+//        itemConfig.setCaseSensitive(CaseSensitive.CASE_SENSITIVE);
 //    	itemConfig.setTrimming(true);
 //    	
 //    	Calendar calendar = GregorianCalendar.getInstance();

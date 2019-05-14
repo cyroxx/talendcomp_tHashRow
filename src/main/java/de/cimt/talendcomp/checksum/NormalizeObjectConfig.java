@@ -2,16 +2,15 @@ package de.cimt.talendcomp.checksum;
 
 public class NormalizeObjectConfig{
 
-	public enum CaseSensitive {
-		CASE_SENSITIVE,
-		UPPER_CASE,
-		LOWER_CASE,
-		NOT_IN_USE
-	}
 	
-	private CaseSensitive caseSensitive = NormalizeObjectConfig.CaseSensitive.UPPER_CASE;
+	private CaseSensitive caseSensitive = CaseSensitive.UPPER_CASE;
 	private boolean trimming;
 	
+	public NormalizeObjectConfig(CaseSensitive caseSensitive, boolean trimming) {
+            this.trimming = trimming;
+            this.caseSensitive=caseSensitive;
+        }
+        
 	public NormalizeObjectConfig(String caseSensitive, boolean trimming) {
 		
 		if(caseSensitive == null)

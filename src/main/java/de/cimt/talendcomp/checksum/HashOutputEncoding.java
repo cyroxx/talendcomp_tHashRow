@@ -4,7 +4,7 @@ import java.util.Base64;
 
 /**
  *
- * @author dkoch
+ * @author daniel.koch@cimt-ag.de
  */
 public enum HashOutputEncoding {
        BASE64 {
@@ -27,7 +27,7 @@ public enum HashOutputEncoding {
         }, 
        PLAIN;
 
-        public static HashOutputEncoding parseEncoding(String type){
+        public static HashOutputEncoding parse(String type){
             try{
                 return HashOutputEncoding.valueOf( type.trim().toUpperCase() );
             }catch(Throwable t){}

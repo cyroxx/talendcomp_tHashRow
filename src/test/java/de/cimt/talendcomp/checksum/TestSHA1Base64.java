@@ -28,7 +28,7 @@ public class TestSHA1Base64 {
     public void testNumericValues() throws IllegalArgumentException {
         String result;
 
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+        itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
         
         sha1Base.reset();
         sha1Base.add("test", itemConfig);
@@ -84,7 +84,7 @@ public class TestSHA1Base64 {
     @Test
     public void testLowerCaseString() throws IllegalArgumentException {
     	
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.LOWER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.LOWER_CASE);
     	
     	sha1Base.reset();
         sha1Base.add("test", itemConfig);
@@ -96,7 +96,7 @@ public class TestSHA1Base64 {
     @Test
     public void testUpperCaseString() throws IllegalArgumentException {
     	
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	
     	sha1Base.reset();
         sha1Base.add("test", itemConfig);

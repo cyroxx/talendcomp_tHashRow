@@ -1,0 +1,47 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode 
+		org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.core.model.utils.NodeUtil
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		org.talend.core.model.metadata.IMetadataColumn
+		org.talend.core.model.metadata.IMetadataTable
+		java.util.List
+    	java.util.Map
+    	java.util.HashMap
+	" 
+%>
+<%
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode) codeGenArgument.getArgument();
+    String cid = node.getUniqueName();
+
+    IConnection connIn = null;
+    List<? extends IConnection> inConns = NodeUtil.getIncomingConnections(node, IConnectionCategory.DATA);
+    if (inConns.size() > 0) {
+        connIn = inConns.get(0);
+    }
+
+    IConnection connOut = null;
+    List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
+    if (outConns.size() > 0) {
+        connOut = outConns.get(0);
+    }
+
+    if(connIn!=null && connOut!=null ){
+%>
+	
+    <%=cid%>_nbLines++;
+    globalMap.put("<%=cid%>_NB_LINE", <%=cid%>_nbLines);
+    try {
+        <%=cid%>_hn.createHashes(<%=connIn.getName()%>, <%=connOut.getName()%>, HashOutputEncoding encoding, HashFunction type)
+    } catch (Exception e) {
+        globalMap.put("<%=cid%>_ERROR_MESSAGE","Build hash failed:" + e.getMessage());
+        throw e;
+    }
+    
+<%
+    } // ende if(connIn!=null && connOut!=null )
+%>

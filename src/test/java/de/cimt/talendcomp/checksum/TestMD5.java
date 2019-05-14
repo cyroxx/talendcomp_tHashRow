@@ -28,7 +28,7 @@ public class TestMD5 {
     public void testNumericValues() throws IllegalArgumentException {
         String result;
 
-        itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+        itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
         
         md5Base.reset();
         md5Base.add("test", itemConfig);
@@ -84,7 +84,7 @@ public class TestMD5 {
     @Test
     public void testLowerCaseString() throws IllegalArgumentException {
     	
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.LOWER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.LOWER_CASE);
     	
     	md5Base.reset();
         md5Base.add("test", itemConfig);
@@ -96,7 +96,7 @@ public class TestMD5 {
     @Test
     public void testUpperCaseString() throws IllegalArgumentException {
     	
-    	itemConfig.setCaseSensitive(NormalizeObjectConfig.CaseSensitive.UPPER_CASE);
+    	itemConfig.setCaseSensitive(CaseSensitive.UPPER_CASE);
     	
     	md5Base.reset();
         md5Base.add("test", itemConfig);
