@@ -32,11 +32,11 @@
 
     if(connIn!=null && connOut!=null ){
 %>
-	
+
     <%=cid%>_nbLines++;
     globalMap.put("<%=cid%>_NB_LINE", <%=cid%>_nbLines);
     try {
-        <%=cid%>_hn.createHashes(<%=connIn.getName()%>, <%=connOut.getName()%>, HashOutputEncoding encoding, HashFunction type)
+        <%=cid%>_hn.createHashes(<%=connIn.getName()%>, <%=connOut.getName()%>, <%=cid%>_encoding, <%=cid%>_type);
     } catch (Exception e) {
         globalMap.put("<%=cid%>_ERROR_MESSAGE","Build hash failed:" + e.getMessage());
         throw e;
