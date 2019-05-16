@@ -9,6 +9,7 @@
 		org.talend.core.model.metadata.IMetadataColumn
 		org.talend.core.model.metadata.IMetadataTable
 		java.util.List
+		java.util.ArrayList
     	java.util.Map
     	java.util.HashMap
 	" 
@@ -20,14 +21,35 @@
 
     IConnection connIn = null;
     List<? extends IConnection> inConns = NodeUtil.getIncomingConnections(node, IConnectionCategory.DATA);
+    
+    List<String> inColumnNames = new ArrayList<String>(); 
     if (inConns.size() > 0) {
         connIn = inConns.get(0);
+        List<String> inputNames=new ArrayList<String>();
+        
+        IMetadataTable inMetadataTable = connIn.getMetadataTable();
+        for (IMetadataColumn column : inMetadataTable.getListColumns()) {
+            inColumnNames.add(column.getLabel());
+        }
     }
 
     IConnection connOut = null;
     List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
     if (outConns.size() > 0) {
         connOut = outConns.get(0);
+        
+        IMetadataTable inMetadataTable = connOut.getMetadataTable();
+        if(connIn!=null){
+            for (IMetadataColumn column : inMetadataTable.getListColumns()) {
+                final String colName=column.getLabel();
+                // assign columns values for columns with same name
+                if(inColumnNames.contains( colName ) ){
+                    %>
+                    <%=connOut.getName()%>.<%=colName%> = <%=connIn.getName()%>.<%=colName%>;
+                    <%
+                }
+            }
+        }
     }
 
     if(connIn!=null && connOut!=null ){
