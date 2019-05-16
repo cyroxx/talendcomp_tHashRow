@@ -153,7 +153,7 @@ public class MultihashHandler {
             final int count= (int) clazz.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
             final Field metadatas = clazz.getField("metadatas");
             final Method setColumnValue = clazz.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
-            final Method getColumnValue = clazz.getMethod("setColumnValue", new Class[]{ int.class });
+            final Method getColumnValue = clazz.getMethod("getColumnValue", new Class[]{ int.class });
             final Method getMetadataByIndex=metadatas.get(dynamic).getClass().getMethod("get", new Class[]{ int.class });
             Method getRowname        =null;
 
@@ -204,10 +204,10 @@ public class MultihashHandler {
              * map of PropertyAccessor for reading and writing of values. 
              */
             Map<String, PropertyAccessor> propertyMapping = getAccessorMapping(inputRow);
-             
             for(List<ColumnHandler> handlerList : configMapping.values()){
                 for(ColumnHandler handler : handlerList ){
-                    handler.accessor=propertyMapping.get(handler.colname);
+                    String colname = casesensitive ? handler.colname : handler.colname.toUpperCase();
+                    handler.accessor=propertyMapping.get(colname);
                     if(handler.accessor==null && !ignoreMissingColumns)
                         throw new java.lang.reflect.MalformedParametersException(handler.colname + " is not accessible in flow. Please check Configuration");
                 }
@@ -222,7 +222,7 @@ public class MultihashHandler {
                 }
             }
         }
-        
+
         for (String targetCol : configMapping.keySet() ){
             Normalization norm=new Normalization(normalizeConfig);
             
