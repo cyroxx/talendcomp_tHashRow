@@ -1,16 +1,14 @@
 package de.cimt.talendcomp.checksum;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.colllib.introspect.Introspector;
-import org.colllib.introspect.PropertyAccessor;
 
 /**
  *
@@ -66,51 +64,125 @@ public class MultihashHandler {
 
     }
 
+    private class PropertyAccessor {
+
+        Field publicField;
+        final String name;
+
+        /**
+         * Get the property type
+         *
+         * @return the property type
+         */
+        public Class<?> getPropertyType() {
+//      if(readMethod != null)
+//         return readMethod.getReturnType();
+//      else
+            return publicField.getType();
+        }
+
+        /**
+         * Set the property value on a given object
+         *
+         * @param invokee the target object
+         * @param value the new value
+         */
+        public void setPropertyValue(Object invokee, Object value) {
+            if (publicField != null) {
+                try {
+                    publicField.set(invokee, value);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                throw new UnsupportedOperationException("Property not writable " + name);
+            }
+        }
+
+        /**
+         * Fetch the property value from a given object
+         *
+         * @param invokee the object to query
+         * @return the property value
+         */
+        public Object getPropertyValue(Object invokee) {
+            try {
+                return publicField.get(invokee);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        /**
+         * Create a new property accessor with a given name
+         *
+         * @param name the property name
+         */
+        public PropertyAccessor(String name, Field field) {
+            this.name = name;
+            this.publicField = field;
+        }
+
+        /**
+         * Create a new property accessor with a given name
+         *
+         * @param name the property name
+         */
+        public PropertyAccessor(String name) {
+            this.name = name;
+            this.publicField = null;
+        }
+
+        /**
+         * Returns the property name
+         *
+         * @return the name
+         */
+        public String getName() {
+            return name;
+        }
+    }
+    
     private class DynamicsPropertyAccessor extends PropertyAccessor{
         // accessor to field storing the dynamic in rowstruct
         final PropertyAccessor dynamicAccessor; 
         // index of dynamic column connected to this PropertyAccessor
         final int index;                        
-        
-        DynamicsPropertyAccessor(String name, PropertyAccessor parent, int index){
+        final Method readMethod;
+        final Method writeMethod;
+                
+        DynamicsPropertyAccessor(String name, PropertyAccessor parent, int index, Method readMethod, Method writeMethod){
             super(name);
             dynamicAccessor=parent;
             this.index=index;
+            this.readMethod=readMethod;
+            this.writeMethod=writeMethod;
         }
 
+        @Override
         public Object getPropertyValue(Object invokee) {
             try {
-                
-                return getReadMethod().invoke(
+                return readMethod.invoke(
                         dynamicAccessor.getPropertyValue( invokee )
                         , new Object[]{index});
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
         @Override
         public void setPropertyValue(Object invokee, Object value) {
             try {
-                
-                super.getWriteMethod().invoke(
+                writeMethod.invoke(
                         dynamicAccessor.getPropertyValue( invokee )
                         , new Object[]{index, value});
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             } 
         }
 
-        
     }
-    private Map<String, List<ColumnHandler>> configMapping;
+    
+    private final Map<String, List<ColumnHandler>> configMapping;
     private Map<String, PropertyAccessor> outputCache=null;
     private final boolean casesensitive;
     private final NormalizeConfig normalizeConfig;
@@ -125,7 +197,7 @@ public class MultihashHandler {
         if(config==null)
             return;
         
-    	List<String> keys=Arrays.asList( config.split( "\\s*;\\s*") );
+    	final List<String> keys=Arrays.asList( config.split( "\\s*;\\s*") );
         
         for(int i=0, max=keys.size();i<max;i++ ){
             String entry = keys.get( i );
@@ -150,6 +222,7 @@ public class MultihashHandler {
             if( !clazz.getName().equals("routines.system.Dynamic") ){
                 return Collections.emptyList();
             }
+            
             final int count= (int) clazz.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
             final Field metadatas = clazz.getField("metadatas");
             final Method setColumnValue = clazz.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
@@ -163,21 +236,24 @@ public class MultihashHandler {
                 if(getRowname==null){
                     getRowname=metadata.getClass().getMethod("getName", new Class[]{});
                 }
-                DynamicsPropertyAccessor dpa=new DynamicsPropertyAccessor((String) getRowname.invoke(metadata, new Object[]{}), dynamicAccessor, i);
-                dpa.setReadMethod(getColumnValue);
-                dpa.setWriteMethod(setColumnValue);
-                pas.add(dpa);
+                pas.add( new DynamicsPropertyAccessor((String) getRowname.invoke(metadata, new Object[]{}), dynamicAccessor, i, getColumnValue, setColumnValue ) );
             }
             return pas;
         } catch (Throwable ex) {
-            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
         
     }
 
     private Map<String, PropertyAccessor> getAccessorMapping(Object row){
-        List<PropertyAccessor> inputIntrospect = Introspector.introspect( row.getClass() );
+        final Class<?> clazz = row.getClass();
+        List<PropertyAccessor> inputIntrospect = new ArrayList<PropertyAccessor>();
+
+        for(Field f : clazz.getFields()) {
+            if(Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()))
+                inputIntrospect.add(new PropertyAccessor(f.getName(), f));
+        }
+
         Map<String, PropertyAccessor> propertyMapping = new HashMap<String, PropertyAccessor>();
 
         for(PropertyAccessor pa : inputIntrospect){
