@@ -36,7 +36,7 @@
 %>
 
 	de.cimt.talendcomp.checksum.NormalizeConfig <%=cid%>_config = new de.cimt.talendcomp.checksum.NormalizeConfig(<%=delimiter%>, <%=nullReplacement%>, <%=enableQuoting%>, <%=quoteCharacter%>, <%=dateFormat%>, "<%=numberFormat%>", <%=fractionSizeFloat%>, <%=fractionSizeDouble%>, <%=modifyHashOutput%>, <%=hashOutputIfBaseIsNull%>, <%=dateInMillis%>, <%=cutOffEmptyTrailingObjects%>);
-	de.cimt.talendcomp.checksum.MultihashHandler <%=cid%>_hn = new de.cimt.talendcomp.checksum.MultihashHandler(<%=cid%>_config, "<%=columnConfigText%>", <%=useCaseSEnsitiveCols%> , <%=ignoremissingColumns%> );
+	de.cimt.talendcomp.checksum.MultihashHandler <%=cid%>_hn = new de.cimt.talendcomp.checksum.MultihashHandler(<%=cid%>_config, <%=columnConfigText%>, <%=useCaseSEnsitiveCols%> , <%=ignoremissingColumns%> );
 
         de.cimt.talendcomp.checksum.HashOutputEncoding <%=cid%>_encoding=de.cimt.talendcomp.checksum.HashOutputEncoding.parse("<%=hashOutputEncoding%>");
         de.cimt.talendcomp.checksum.HashFunction <%=cid%>_type=de.cimt.talendcomp.checksum.HashFunction.parse("<%=hashType%>");
