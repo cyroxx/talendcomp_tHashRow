@@ -75,7 +75,109 @@ If all input values are null, the hash value will be replaced with the given val
 ### Show hash input
 If checked the hash input (concatenation of all input values) will be exposed to the selected column
 
-## Support of Enterprise features
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Talend component tMultiHashRow
+# Basic Settings
+
+## Basic configuration 
+### Hash type
+Algorithm that will be used to generate the hash 
+
+## Hash input configuration
+
+To enable a multiple configuration it was necessary to replace the column configuration known from tHashRow with a text input. 
+For simple realization a Key-Value Pair was chosen, containing the target column as key and the used column as value. 
+If several columns must be used for a hash, the input is made using a comma-separated list. 
+The well-known functions for trimming a column or for differentiating between upper and lower case are performed using a subsequent definition in square brackets.
+Several hash calculation configurations are connected separately by ; . 
+
+Shortcut | Description
+------------ | -------------
+T | Check if column should be trimmed
+U | Select if column should be converted to upper case
+L | Select if column should be converted to lower case
+C | Use case sensitive values (default) 
+
+Example; 
+
+```
+TARGETCOL_HASH_1=SOURCECOL_1, SOURCECOL_2;
+TARGETCOL_HASH_2=SOURCECOL_2, SOURCECOL_1, SOURCECOL_3;
+...
+TARGETCOL_HASH_n=SOURCECOL_x, SOURCECOL_2, SOURCECOL_9, SOURCECOL_1;
+
+```
+
+
+### Delimiter
+Delimter to seperate the input values
+
+### Null replacement
+Value that will be used to calculate the hash, if input value is null
+- Example if replacement value is set to "#NULL#""
+    + COLUMN_1 = "Test"
+    + COLUMN_2 = null
+    + COLUMN_3 = 123
+    + Hash Input results in "Test";#NULL#;123 
+
+### Fraction size (float)
+Maximum precision of float values
+
+### Fraction size (double)
+Maximum precision of double values
+
+### Number format
+List of available number formats. Grouping is gernerally disabled. 
+
+### Date format
+#### Format date as miliseconds
+- if checked
+    + all date fields will be represented as miliseconds since unix epoch
+- if unchecked
+    + all date fields will be represented in the given date format 
+
+### Enable string quoting
+String based fields will be surrounded with the given quotation mark
+
+### Cut of empty trialing hash input values
+If checked all empty trailing values will be truncated before hash will be calculated
+- Example without quoting
+    + Hash Input = CUSTOMER A;1234;STREET 1;;;
+    + results in CUSTOMER A;1234;STREET 1
+- Example with quoting
+    + Hash Input = "CUSTOMER A";1234;"STREET 1";"";;""
+    + results also in CUSTOMER A;1234;STREET 1
+
+# Advanced Settings
+
+## Hash output manipulation
+### Modify hash output
+If all input values are null, the hash value will be replaced with the given value 
+- Example 1 
+    + checked and value is set to "22222222222222222222222222222222"
+    + Hash input = ;;;;;
+    + Hash value = "22222222222222222222222222222222"
+- Example 2
+    + unchecked
+    + Hash input = ;;;;;
+    + Hash value = 8f0158355357e8302939ea687dba9363
+
+
+# Support of Enterprise features
 This version supports the dynamic datatype. To use it's necessary to register this component in the talend plugin jar or to cast type to Object type. 
 From https://help.talend.com/reader/MNcEDgjyM49yQ58GboyG4Q/doXCP4sJgwe85tm8ny5Zqw
 
