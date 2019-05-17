@@ -2,11 +2,37 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.cimt.talendcomp</groupId>
-    <artifactId>cimt-talendcomp-hashrow</artifactId>
+    <artifactId>talendcomp_tHashComponents</artifactId>
     <version>1.7</version>
     <packaging>jar</packaging>
 
-    <name>talendcomp_tHashRow [FORK DK ${version}]</name>
+    <name>talendcomp_tHashComponents</name>
+    
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/dakocddo/talendcomp_tHashRow/issues</url>
+    </issueManagement>
+    
+    <developers>
+        <developer>
+            <name>Daniel Koch</name>
+            <email>Daniel.Koch@cimt-ag.de</email>
+            <organization>cimt AG</organization>
+            <organizationUrl>https://www.cimt-ag.de</organizationUrl>
+        </developer>
+        <developer>
+            <name>Babak Hashemi</name>
+            <email>Babak.Hashemi@cimt-ag.de</email>
+            <organization>cimt AG</organization>
+            <organizationUrl>https://www.cimt-ag.de</organizationUrl>
+        </developer>
+        <developer>
+            <name>Jan Lolling</name>
+            <email>jan.lolling@gmail.com</email>
+            <organization>GVL</organization>
+            <organizationUrl>https://gvl.de</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>	
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -28,6 +54,7 @@
             <version>1.6</version>
         </dependency>
     </dependencies>
+    
     <build>
         <plugins>
             <plugin>
@@ -84,7 +111,7 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <phase>deploy</phase>
+                        <phase>install</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
