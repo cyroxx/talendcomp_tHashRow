@@ -272,8 +272,18 @@ public class MultihashHandler {
         return propertyMapping;
         
     }
-            
-    public void createHashes(Object inputRow, Object outputRow, HashOutputEncoding encoding, HashFunction type) {
+    
+    /**
+     * 
+     * @param inputRow
+     * @param outputRow
+     * @param encoding
+     * @param type
+     * @return return a list of all hashes calculated as , seperated string
+     */
+    public String createHashes(Object inputRow, Object outputRow, HashOutputEncoding encoding, HashFunction type) {
+        StringBuffer buf=new StringBuffer();
+        
         if(outputCache==null){
             /**
              * first row the value is not set and we can inspect structure to build up
@@ -305,10 +315,17 @@ public class MultihashHandler {
             for(ColumnHandler col : configMapping.get(targetCol)){
                 norm.add(  col.accessor.getPropertyValue(inputRow), col.createNormalizeObjectConfig() );
             }
+            PropertyAccessor pa = outputCache.get(targetCol);
             
-            outputCache.get(targetCol).setPropertyValue(outputRow, norm.calculateHash(  type, encoding));
+            pa.setPropertyValue(outputRow, norm.calculateHash(  type, encoding ) );
+            
+            if(buf.length()>0)
+                buf.append(", ");
+            
+            buf.append( pa.name );
         }
-            
+        return buf.toString();
     }
 
+     
 }

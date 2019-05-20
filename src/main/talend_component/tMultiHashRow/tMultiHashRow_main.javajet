@@ -19,6 +19,7 @@
     INode node = (INode) codeGenArgument.getArgument();
     String cid = node.getUniqueName();
 
+    boolean useCaseSensitiveCols =  ("true").equals(ElementParameterParser.getValue(node,"__CASE_SENSITIVE__"));
     IConnection connIn = null;
     List<? extends IConnection> inConns = NodeUtil.getIncomingConnections(node, IConnectionCategory.DATA);
     
@@ -57,8 +58,14 @@
 
     <%=cid%>_nbLines++;
     globalMap.put("<%=cid%>_NB_LINE", <%=cid%>_nbLines);
+    if( <%=cid%>_hn == null)
+        <%=cid%>_hn     = new de.cimt.talendcomp.checksum.MultihashHandler(<%=cid%>_config, <%=columnConfigText%>, <%=useCaseSensitiveCols%> , <%=ignoremissingColumns%> );
+
     try {
-        <%=cid%>_hn.createHashes(<%=connIn.getName()%>, <%=connOut.getName()%>, <%=cid%>_encoding, <%=cid%>_type);
+        globalMap.put("<%=cid%>_HASHED_COLS",
+            <%=cid%>_hn.createHashes(<%=connIn.getName()%>, <%=connOut.getName()%>, <%=cid%>_encoding, <%=cid%>_type);
+        );
+        
     } catch (Exception e) {
         globalMap.put("<%=cid%>_ERROR_MESSAGE","Build hash failed:" + e.getMessage());
         throw e;
