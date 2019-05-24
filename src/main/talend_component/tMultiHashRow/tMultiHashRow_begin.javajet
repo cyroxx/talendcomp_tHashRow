@@ -14,6 +14,9 @@
 	if (nullReplacement == null || nullReplacement.trim().isEmpty()) {
 		nullReplacement = "";
 	}
+    String columnConfigText  = ElementParameterParser.getValue(node, "__COLUMN_CONFIG__");
+    boolean ignoremissingColumns  = ("true").equals( ElementParameterParser.getValue(node, "__IGNORE_MISSING_COLUMNS__") );
+    boolean useCaseSensitiveCols =  ("true").equals(ElementParameterParser.getValue(node,"__CASE_SENSITIVE__"));
         String fractionSizeFloat = ElementParameterParser.getValue(node, "__FRACTION_SIZE_FLOAT__");
 	String fractionSizeDouble = ElementParameterParser.getValue(node, "__FRACTION_SIZE_DOUBLE__");
 	String numberFormat = ElementParameterParser.getValue(node, "__NUMBER_FORMAT__");
@@ -26,17 +29,16 @@
 		hashOutputIfBaseIsNull = "";
 	}
         
-        boolean ignoremissingColumns  = ("true").equals( ElementParameterParser.getValue(node, "__DIE_WHEN_COLUMNS_MISSING__") );
 	String hashType = ElementParameterParser.getValue(node, "__HASH_TYPE__");
 	String hashOutputEncoding = ElementParameterParser.getValue(node, "__HASH_OUTPUT_ENCODING__");
 	boolean dateInMillis =  ("true").equals(ElementParameterParser.getValue(node,"__ENABLE_DATE_AS_MILLIS__"));
 	boolean cutOffEmptyTrailingObjects =  ("true").equals(ElementParameterParser.getValue(node,"__CUT_OFF_TRAILING_OBJECTS__"));
 	
-	String columnConfigText  = ElementParameterParser.getValue(node, "__COLUMN_CONFIG__");
 %>
 
     de.cimt.talendcomp.checksum.NormalizeConfig  <%=cid%>_config = new de.cimt.talendcomp.checksum.NormalizeConfig(<%=delimiter%>, <%=nullReplacement%>, <%=enableQuoting%>, <%=quoteCharacter%>, <%=dateFormat%>, "<%=numberFormat%>", <%=fractionSizeFloat%>, <%=fractionSizeDouble%>, <%=modifyHashOutput%>, <%=hashOutputIfBaseIsNull%>, <%=dateInMillis%>, <%=cutOffEmptyTrailingObjects%>);
-    de.cimt.talendcomp.checksum.MultihashHandler <%=cid%>_hn     = null;
+    de.cimt.talendcomp.checksum.MultihashHandler <%=cid%>_hn     = new de.cimt.talendcomp.checksum.MultihashHandler(<%=cid%>_config, <%=columnConfigText%>, <%=useCaseSensitiveCols%> , <%=ignoremissingColumns%> );
+    globalMap.put("<%=cid%>_COLUMN_MAPPING", <%=cid%>_hn.mappingOfUsedIdentifiers());;
     de.cimt.talendcomp.checksum.HashOutputEncoding <%=cid%>_encoding = de.cimt.talendcomp.checksum.HashOutputEncoding.parse("<%=hashOutputEncoding%>");
     de.cimt.talendcomp.checksum.HashFunction       <%=cid%>_type     = de.cimt.talendcomp.checksum.HashFunction.parse("<%=hashType%>");
 
