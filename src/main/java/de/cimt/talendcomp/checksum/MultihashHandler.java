@@ -7,8 +7,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -16,6 +21,21 @@ import java.util.Map;
  */
 public class MultihashHandler {
 
+    private static final Logger LOG=Logger.getLogger(MultihashHandler.class);
+    private static final Class dynaClass;
+    
+    static{
+        BasicConfigurator.configure();
+        LOG.setLevel( Level.DEBUG );
+        
+        Class c=null;
+        try {
+            c=Class.forName("routines.system.Dynamic");
+        } catch (ClassNotFoundException ex) {
+            c=null;
+        }
+        dynaClass=c;
+    }
     public static class ColumnHandler {
 
         public final String colname;
@@ -68,6 +88,7 @@ public class MultihashHandler {
 
         Field publicField;
         final String name;
+        public boolean dynamic=false;
 
         /**
          * Get the property type
@@ -142,7 +163,7 @@ public class MultihashHandler {
             return name;
         }
     }
-    
+  
     private class DynamicsPropertyAccessor extends PropertyAccessor{
         // accessor to field storing the dynamic in rowstruct
         final PropertyAccessor dynamicAccessor; 
@@ -216,17 +237,20 @@ public class MultihashHandler {
     private List<PropertyAccessor> exposeDynamicRows(Object row , PropertyAccessor dynamicAccessor){
         try {
             Object dynamic=dynamicAccessor.getPropertyValue(row);
-            final Class  clazz = dynamic.getClass();
+//            final Class  clazz = dynamic.getClass();
 
             List<PropertyAccessor> pas=new ArrayList<PropertyAccessor>();
-            if( !clazz.getName().equals("routines.system.Dynamic") ){
+            
+            //if( !clazz.getName().equals("routines.system.Dynamic") ){
+            if( dynaClass==null && dynamicAccessor.dynamic ){
+                LOG.warn("no dynamic found");
                 return Collections.emptyList();
             }
             
-            final int count= (int) clazz.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
-            final Field metadatas = clazz.getField("metadatas");
-            final Method setColumnValue = clazz.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
-            final Method getColumnValue = clazz.getMethod("getColumnValue", new Class[]{ int.class });
+            final int count= (int) dynaClass.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
+            final Field metadatas = dynaClass.getField("metadatas");
+            final Method setColumnValue = dynaClass.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
+            final Method getColumnValue = dynaClass.getMethod("getColumnValue", new Class[]{ int.class });
             final Method getMetadataByIndex=metadatas.get(dynamic).getClass().getMethod("get", new Class[]{ int.class });
             Method getRowname        =null;
 
@@ -250,21 +274,36 @@ public class MultihashHandler {
         List<PropertyAccessor> inputIntrospect = new ArrayList<PropertyAccessor>();
 
         for(Field f : clazz.getFields()) {
-            if(Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers()))
+            LOG.warn( "field:" + f );
+            if(Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())){
                 inputIntrospect.add(new PropertyAccessor(f.getName(), f));
+            }
         }
 
         Map<String, PropertyAccessor> propertyMapping = new HashMap<String, PropertyAccessor>();
 
         for(PropertyAccessor pa : inputIntrospect){
             String relatedProp= casesensitive ? pa.getName() : pa.getName().toUpperCase();
-            if( pa.getPropertyType().getName().equals("routines.system.Dynamic") ){
+            Class colClazz=pa.getPropertyType();
+            if(colClazz.equals(Object.class) && dynaClass!=null){
+                try{
+                    dynaClass.cast( pa.getPropertyValue(row) );
+                    pa.dynamic=true;
+                }catch(ClassCastException cce){}
+            } else if( pa.getPropertyType().getName().equals("routines.system.Dynamic") ){
+                pa.dynamic=true;
+            }
+            
+            if(pa.dynamic){
+                LOG.info("Handle Dynamic "+relatedProp);
                 List<PropertyAccessor> exposed=exposeDynamicRows( row, pa );
                 for(PropertyAccessor dpa : exposed) {
                     relatedProp= casesensitive ? dpa.getName() : dpa.getName().toUpperCase();
+                    LOG.info("register dyn col "+relatedProp);
                     propertyMapping.put(relatedProp, dpa);
                 }
             } else {
+                    LOG.info("register col "+relatedProp+ " type:"+pa.getPropertyType().getName());
                 propertyMapping.put(relatedProp, pa);
             }
         }
@@ -309,14 +348,16 @@ public class MultihashHandler {
             }
         }
 
-        for (String targetCol : configMapping.keySet() ){
+        for (String targetCol : configMapping.keySet() ){            
+            if(!outputCache.containsKey(targetCol)){
+                continue;
+            }
             Normalization norm=new Normalization(normalizeConfig);
             
             for(ColumnHandler col : configMapping.get(targetCol)){
                 norm.add(  col.accessor.getPropertyValue(inputRow), col.createNormalizeObjectConfig() );
             }
             PropertyAccessor pa = outputCache.get(targetCol);
-            
             pa.setPropertyValue(outputRow, norm.calculateHash(  type, encoding ) );
             
             if(buf.length()>0)
@@ -327,5 +368,16 @@ public class MultihashHandler {
         return buf.toString();
     }
 
+    public Map<String, List<String>> mappingOfUsedIdentifiers() {
+        Map<String, List<String>> res=new HashMap<String, List<String>>();
+        for(Map.Entry<String, List<ColumnHandler>> entrySet : configMapping.entrySet()){
+            List<String> idents=new ArrayList<String>();
+            for(ColumnHandler value : entrySet.getValue()){
+                idents.add(value.colname);
+            }
+            res.put( entrySet.getKey(), idents);
+        }
+        return res;
+    }
      
 }
