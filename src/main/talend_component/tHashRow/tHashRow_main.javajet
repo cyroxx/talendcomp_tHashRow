@@ -9,8 +9,8 @@
 		org.talend.core.model.metadata.IMetadataColumn
 		org.talend.core.model.metadata.IMetadataTable
 		java.util.List
-    	java.util.Map
-    	java.util.HashMap
+                java.util.Map
+                java.util.HashMap
 	" 
 %>
 
@@ -20,6 +20,8 @@
 	INode node = (INode) codeGenArgument.getArgument();
 	String cid = node.getUniqueName();
 	String outputColumn = ElementParameterParser.getValue(node, "__OUTPUT_COLUMN__");
+	boolean exposeHashBase = ("true").equals(ElementParameterParser.getValue(node,"__EXPOSE_HASH_BASE__"));
+	String hashBaseOutputColumn = ElementParameterParser.getValue(node, "__HASH_BASE_OUTPUT_COLUMN__");
 
         IConnection connIn = null;
 	Map<String, IMetadataColumn> inColumns = new HashMap<String, IMetadataColumn>(); // to check the out going columns for hand over the data
@@ -86,15 +88,15 @@
 	}
 %>
 	try {
-		String hash = null;
-		hash = <%=cid%>_hn.calculateHash(<%=cid%>_type, <%=cid%>_encoding);
+		String hash = <%=cid%>_hn.calculateHash(<%=cid%>_type, <%=cid%>_encoding);
 		
 <%			if (connOut != null && outputColumn != null && outputColumn.isEmpty() == false) { %>
 				<%=connOut.getName()%>.<%=outputColumn%> = hash;
 				globalMap.put("<%=cid%>_HASH", hash);
-<%			} 
+<%			} %>
 
- 			if (exposeHashBase){ %>
+
+<%			if (exposeHashBase){ %>
 				<%=connOut.getName()%>.<%=hashBaseOutputColumn%> = <%=cid%>_hn.getNormalizedString();
 <%			} %>
 

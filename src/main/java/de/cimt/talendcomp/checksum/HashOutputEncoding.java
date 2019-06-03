@@ -36,6 +36,9 @@ public enum HashOutputEncoding {
         }
         
         public String encode(byte[] value) {
+            if(value==null)
+                return null;
+            
             return new String(value);
         }
 }

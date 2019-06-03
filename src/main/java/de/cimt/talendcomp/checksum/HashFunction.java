@@ -29,6 +29,8 @@ public enum HashFunction {
     }
 
     public byte[] digest(String content) {
+        if(content==null)
+            return null;
         return getMessageDigest().digest(content.getBytes(Charset.forName("UTF-8")));
     }
 
