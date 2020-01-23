@@ -7,10 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -22,11 +20,11 @@ import org.apache.log4j.Logger;
 public class MultihashHandler {
 
     private static final Logger LOG=Logger.getLogger(MultihashHandler.class);
-    private static final Class dynaClass;
+    private static final Class DYNACLASS;
     
     static{
         BasicConfigurator.configure();
-        LOG.setLevel( Level.DEBUG );
+//        LOG.setLevel( Level.DEBUG );
         
         Class c=null;
         try {
@@ -34,7 +32,7 @@ public class MultihashHandler {
         } catch (ClassNotFoundException ex) {
             c=null;
         }
-        dynaClass=c;
+        DYNACLASS=c;
     }
     public static class ColumnHandler {
 
@@ -47,12 +45,10 @@ public class MultihashHandler {
             final int startpos = newColname.indexOf("[");
             boolean settrim = false;
             CaseSensitive setcase = CaseSensitive.NOT_IN_USE;
-            System.err.println("newColname=" + newColname);
             if (startpos > 0) {
                 final String handlingStr = newColname.substring(startpos).toUpperCase();
                 newColname = newColname.substring(0, startpos);
 
-                System.err.println("handle params " + handlingStr);
                 if (handlingStr.contains("C")) {
                     setcase = CaseSensitive.CASE_SENSITIVE;
                 }
@@ -242,15 +238,15 @@ public class MultihashHandler {
             List<PropertyAccessor> pas=new ArrayList<PropertyAccessor>();
             
             //if( !clazz.getName().equals("routines.system.Dynamic") ){
-            if( dynaClass==null && dynamicAccessor.dynamic ){
-                LOG.warn("no dynamic found");
+            if( DYNACLASS==null && dynamicAccessor.dynamic ){
+                LOG.debug("no dynamic found");
                 return Collections.emptyList();
             }
             
-            final int count= (int) dynaClass.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
-            final Field metadatas = dynaClass.getField("metadatas");
-            final Method setColumnValue = dynaClass.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
-            final Method getColumnValue = dynaClass.getMethod("getColumnValue", new Class[]{ int.class });
+            final int count= (int) DYNACLASS.getMethod("getColumnCount", new Class[]{}).invoke( dynamic, new Object[]{} );
+            final Field metadatas = DYNACLASS.getField("metadatas");
+            final Method setColumnValue = DYNACLASS.getMethod("setColumnValue", new Class[]{ int.class, Object.class });
+            final Method getColumnValue = DYNACLASS.getMethod("getColumnValue", new Class[]{ int.class });
             final Method getMetadataByIndex=metadatas.get(dynamic).getClass().getMethod("get", new Class[]{ int.class });
             Method getRowname        =null;
 
@@ -274,7 +270,7 @@ public class MultihashHandler {
         List<PropertyAccessor> inputIntrospect = new ArrayList<PropertyAccessor>();
 
         for(Field f : clazz.getFields()) {
-            LOG.warn( "field:" + f );
+            LOG.debug( "field:" + f );
             if(Modifier.isPublic(f.getModifiers()) && !Modifier.isStatic(f.getModifiers())){
                 inputIntrospect.add(new PropertyAccessor(f.getName(), f));
             }
@@ -285,9 +281,9 @@ public class MultihashHandler {
         for(PropertyAccessor pa : inputIntrospect){
             String relatedProp= casesensitive ? pa.getName() : pa.getName().toUpperCase();
             Class colClazz=pa.getPropertyType();
-            if(colClazz.equals(Object.class) && dynaClass!=null){
+            if(colClazz.equals(Object.class) && DYNACLASS!=null){
                 try{
-                    dynaClass.cast( pa.getPropertyValue(row) );
+                    DYNACLASS.cast( pa.getPropertyValue(row) );
                     pa.dynamic=true;
                 }catch(ClassCastException cce){}
             } else if( pa.getPropertyType().getName().equals("routines.system.Dynamic") ){
@@ -295,15 +291,15 @@ public class MultihashHandler {
             }
             
             if(pa.dynamic){
-                LOG.info("Handle Dynamic "+relatedProp);
+                LOG.debug("Handle Dynamic "+relatedProp);
                 List<PropertyAccessor> exposed=exposeDynamicRows( row, pa );
                 for(PropertyAccessor dpa : exposed) {
                     relatedProp= casesensitive ? dpa.getName() : dpa.getName().toUpperCase();
-                    LOG.info("register dyn col "+relatedProp);
+                    LOG.debug("register dyn col "+relatedProp);
                     propertyMapping.put(relatedProp, dpa);
                 }
             } else {
-                    LOG.info("register col "+relatedProp+ " type:"+pa.getPropertyType().getName());
+                    LOG.debug("register col "+relatedProp+ " type:"+pa.getPropertyType().getName());
                 propertyMapping.put(relatedProp, pa);
             }
         }
