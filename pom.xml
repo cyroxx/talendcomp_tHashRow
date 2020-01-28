@@ -53,6 +53,7 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     
@@ -74,6 +75,7 @@
                     <componentBaseDir>target/talend_component/</componentBaseDir>
                     <copyFromSourceBaseDir>src/main/talend_component</copyFromSourceBaseDir>
                     <componentName>tHashRow</componentName>
+                    <!--<excludeScopes>provided</excludeScopes>-->
                 </configuration>
                 <executions>
                     <execution>

@@ -1,52 +1,50 @@
 package de.cimt.talendcomp.checksum;
 
-public class NormalizeObjectConfig{
+public class NormalizeObjectConfig {
 
-	
-	private CaseSensitive caseSensitive = CaseSensitive.UPPER_CASE;
-	private boolean trimming;
-	
-	public NormalizeObjectConfig(CaseSensitive caseSensitive, boolean trimming) {
-            this.trimming = trimming;
-            this.caseSensitive=caseSensitive;
+    private CaseSensitive caseSensitive = CaseSensitive.UPPER_CASE;
+    private boolean trimming;
+
+    public NormalizeObjectConfig(CaseSensitive caseSensitive, boolean trimming) {
+        this.trimming = trimming;
+        this.caseSensitive = caseSensitive;
+    }
+
+    public NormalizeObjectConfig(String caseSensitive, boolean trimming) {
+
+        if (caseSensitive == null) {
+            throw new IllegalArgumentException("caseSensitive must not be null");
         }
-        
-	public NormalizeObjectConfig(String caseSensitive, boolean trimming) {
-		
-		if(caseSensitive == null)
-			throw new IllegalArgumentException("caseSensitive must not be null");
-		
-		if("CASE_SENSITIVE".equalsIgnoreCase(caseSensitive)){
-			this.caseSensitive = CaseSensitive.CASE_SENSITIVE;
-		} else if ("UPPER_CASE".equalsIgnoreCase(caseSensitive)){
-			this.caseSensitive = CaseSensitive.UPPER_CASE;
-		} else if ("LOWER_CASE".equalsIgnoreCase(caseSensitive)) {
-			this.caseSensitive = CaseSensitive.LOWER_CASE;
-		} else if ("NOT_IN_USE".equalsIgnoreCase(caseSensitive)) {
-			this.caseSensitive = CaseSensitive.LOWER_CASE;
-		} else {
-			throw new IllegalArgumentException("caseSensitive has to be CASE_SENSITIVE, UPPER_CASE, LOWER_CASE or NOT_IN_USE");
-		}
-		
-		this.trimming = trimming;
-	}
 
-	public CaseSensitive getCaseSensitive() {
-		return caseSensitive;
-	}
+        if ("CASE_SENSITIVE".equalsIgnoreCase(caseSensitive)) {
+            this.caseSensitive = CaseSensitive.CASE_SENSITIVE;
+        } else if ("UPPER_CASE".equalsIgnoreCase(caseSensitive)) {
+            this.caseSensitive = CaseSensitive.UPPER_CASE;
+        } else if ("LOWER_CASE".equalsIgnoreCase(caseSensitive)) {
+            this.caseSensitive = CaseSensitive.LOWER_CASE;
+        } else if ("NOT_IN_USE".equalsIgnoreCase(caseSensitive)) {
+            this.caseSensitive = CaseSensitive.LOWER_CASE;
+        } else {
+            throw new IllegalArgumentException("caseSensitive has to be CASE_SENSITIVE, UPPER_CASE, LOWER_CASE or NOT_IN_USE");
+        }
 
-	public boolean isTrimming() {
-		return trimming;
-	}
+        this.trimming = trimming;
+    }
 
-	public void setCaseSensitive(CaseSensitive caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
+    public CaseSensitive getCaseSensitive() {
+        return caseSensitive;
+    }
 
-	public void setTrimming(boolean trimming) {
-		this.trimming = trimming;
-	}
-	
-	
-	
+    public boolean isTrimming() {
+        return trimming;
+    }
+
+    public void setCaseSensitive(CaseSensitive caseSensitive) {
+        this.caseSensitive = caseSensitive;
+    }
+
+    public void setTrimming(boolean trimming) {
+        this.trimming = trimming;
+    }
+
 }
